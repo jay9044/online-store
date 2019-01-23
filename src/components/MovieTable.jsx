@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import Like from "../components/common/Like";
 import Table from "../components/common/Table";
 
@@ -7,7 +8,13 @@ class MovieTable extends Component {
     super(props);
     this.state = {
       columns: [
-        { path: "title", label: "Title" },
+        {
+          path: "title",
+          label: "Title",
+          content: movie => (
+            <Link to={`/movies/${movie._id}`}>{movie.title}</Link> // will need a make a route now for movies and id
+          )
+        },
         { path: "genre.name", label: "Genre" },
         { path: "numberInStock", label: "Stock" },
         { path: "dailyRentalRate", label: "Rate" },
