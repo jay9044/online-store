@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import Joi from "joi-browser";
-import Form from "./Form";
+import FormInput from "./common/FormInput";
+import Form from "./common/Form";
 
-class LoginForm extends Form {
+class Register extends Form {
   constructor(props) {
     super(props);
     this.state = {
-      data: { username: "", password: "" },
+      data: { username: "", password: "", name: "" },
       errors: {}
     };
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -15,11 +16,16 @@ class LoginForm extends Form {
 
   schema = {
     username: Joi.string()
+      .email({ minDomainAtoms: 2 })
       .required()
       .label("Username"),
     password: Joi.string()
       .required()
-      .label("Password")
+      .min(5)
+      .label("Password"),
+    name: Joi.string()
+      .required()
+      .label("First Name")
   };
 
   doSubmit() {
@@ -32,29 +38,16 @@ class LoginForm extends Form {
   render() {
     return (
       <div>
-        <h1>Login</h1>
-        <form onSubmit={this.handleSubmit}>
+        <h1>Register</h1>
+        <form onClick={this.handleSubmit}>
           {this.renderInput("username", "Username")}
           {this.renderInput("password", "Password", "password")}
-          {/* <FormInput
-            name="username"
-            label="Username"
-            value={data.username}
-            onChange={this.handleChange}
-            error={errors.username}
-          />
-          <FormInput
-            name="password"
-            label="Password"
-            value={data.password.value}
-            onChange={this.handleChange}
-            error={errors.password}
-          /> */}
-          {this.renderButton("Login")}
+          {this.renderInput("name", "Name")}
+          {this.renderButton("Register")}
         </form>
       </div>
     );
   }
 }
 
-export default LoginForm;
+export default Register;
