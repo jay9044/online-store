@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import _ from "lodash"; //lodash has a method called get
-import Like from "../common/Like";
 
 //interface;
 // columns : array
@@ -25,7 +24,7 @@ class TableBody extends Component {
   render() {
     // const { paginateMovies, onHandleLike, onDelete } = this.props;
     const { data, columns } = this.props;
-    console.log(data);
+
     return (
       <tbody>
         {data.map(item => (

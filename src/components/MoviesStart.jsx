@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import _ from "lodash";
+import { Link } from "react-router-dom";
 import paginate from "../utils/paginate";
 import SelectGenre from "../components/common/SelectGenre";
 import Pagination from "../components/common/Pagination";
 import { getMovies } from "../services/fakeMovieService";
 import { getGenres } from "../services/fakeGenreService";
 import MovieTable from "./MovieTable";
+import SearhBar from "./common/Searchbar";
 
 class MoviesStart extends Component {
   constructor(props) {
@@ -15,7 +17,8 @@ class MoviesStart extends Component {
       genres: [],
       pageSize: 4, // amount of movies we want on each page
       currentPage: 1,
-      currentGenre: "",
+      currentGenre: null,
+      searchQuery: "",
       sortColumn: { path: "title", order: "asc" }
     };
     this.handleOnPageChange = this.handleOnPageChange.bind(this);
@@ -23,16 +26,23 @@ class MoviesStart extends Component {
     this.handleLike = this.handleLike.bind(this);
     this.handleDeleteMovie = this.handleDeleteMovie.bind(this);
     this.handleSort = this.handleSort.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
   }
 
   componentDidMount() {
-    const genres = [{ _id: "", name: "All Genres" }, ...getGenres()]; // add a all generes objects to get genres array // though note i didnt give it an id / gave it and empty to for a key in array error
-
-    console.log(genres);
+    const genres = [{ name: "All Genres" }, ...getGenres()]; // add a all generes objects to get genres array // though note i didnt give it an id / gave it and empty to for a key in array error
 
     this.setState({
       movies: getMovies(),
       genres
+    });
+  }
+
+  handleSearch(query) {
+    this.setState({
+      searchQuery: query,
+      currentGenre: null,
+      currentPage: 1
     });
   }
 
@@ -69,7 +79,8 @@ class MoviesStart extends Component {
     // );
     this.setState({
       currentGenre: genre,
-      currentPage: 1
+      currentPage: 1,
+      searchQuery: ""
       // movies
     });
   }
@@ -95,16 +106,22 @@ class MoviesStart extends Component {
       pageSize,
       currentPage,
       movies,
-      genres,
+
       currentGenre,
-      sortColumn
+      sortColumn,
+      searchQuery
     } = this.state;
 
     // we filter, then sort then paginate
-    const filtered =
-      currentGenre && currentGenre._id
-        ? movies.filter(movie => movie.genre._id === currentGenre._id)
-        : movies;
+
+    let filtered = movies;
+
+    if (searchQuery)
+      filtered = movies.filter(m =>
+        m.title.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
+    else if (currentGenre && currentGenre._id)
+      filtered = movies.filter(m => m.genre._id === currentGenre._id);
 
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]); // built in lodash function
 
@@ -120,7 +137,8 @@ class MoviesStart extends Component {
       currentPage,
       genres,
       currentGenre,
-      sortColumn
+      sortColumn,
+      searchQuery
     } = this.state;
     // console.log(count);
 
@@ -142,7 +160,12 @@ class MoviesStart extends Component {
             <h1>There are no movies</h1>
           ) : (
             <div>
+              <Link className="btn btn-primary" to="/movies/new">
+                New Movie
+              </Link>
+
               <h1>Showing {totalCount} in the database</h1>
+              <SearhBar value={searchQuery} onChange={this.handleSearch} />
               <MovieTable
                 paginateMovies={data}
                 onHandleLike={this.handleLike}
